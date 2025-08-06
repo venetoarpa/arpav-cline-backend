@@ -119,6 +119,9 @@ class HistoricalCoverageDownloadRequestView(ModelView):
         starlette_admin.BooleanField("is_public_sector"),
         starlette_admin.StringField("download_reason"),
         starlette_admin.StringField("climatological_variable"),
+        starlette_admin.StringField("aggregation_period"),
+        starlette_admin.StringField("measure_type"),
+        starlette_admin.StringField("year_period"),
         starlette_admin.StringField("decade"),
         starlette_admin.StringField("reference_period"),
     )
