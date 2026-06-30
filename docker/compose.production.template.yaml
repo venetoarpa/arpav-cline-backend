@@ -75,6 +75,7 @@ services:
       ARPAV_PPCV__NUM_UVICORN_WORKER_PROCESSES: "${webapp_env_num_uvicorn_worker_processes}"
       ARPAV_PPCV__DB_DSN: "${webapp_env_db_dsn}"
       ARPAV_PPCV__DB_POOL_SIZE: "${webapp_env_db_pool_size}"
+      ARPAV_PPCV__HTTP_CLIENT_TIMEOUT_SECONDS: "${webapp_env_http_client_timeout_seconds}"
       ARPAV_PPCV__UVICORN_LOG_CONFIG_FILE: "${webapp_env_uvicorn_log_config_file}"
       ARPAV_PPCV__SESSION_SECRET_KEY: "${webapp_env_session_secret_key}"
       ARPAV_PPCV__ADMIN_USER__USERNAME: "${webapp_env_admin_user_username}"

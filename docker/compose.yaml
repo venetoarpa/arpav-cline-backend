@@ -58,7 +58,7 @@ name: arpav-cline
 services:
 
   reverse-proxy:
-    image: traefik:3.0.2
+    image: traefik:v3
     volumes:
       - type: bind
         source: /var/run/docker.sock

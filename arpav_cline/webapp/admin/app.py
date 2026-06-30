@@ -1,6 +1,8 @@
 import logging
 import typing
 
+from pathlib import Path
+
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -78,6 +80,7 @@ def create_admin(settings: "ArpavPpcvSettings") -> ArpavPpcvAdmin:
         engine,
         debug=settings.debug,
         templates_dir=str(settings.templates_dir / "admin"),
+        statics_dir=str(Path(__file__).parent / "statics"),
         auth_provider=auth.UsernameAndPasswordProvider(),
         middlewares=[
             Middleware(SessionMiddleware, secret_key=settings.session_secret_key),

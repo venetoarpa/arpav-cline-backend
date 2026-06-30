@@ -73,7 +73,13 @@ from ....schemas.static import (
 from ....schemas.dataseries import MannKendallParameters
 from ... import (
     dependencies,
-    parameters,
+)
+from ...parameters import (
+    COORDS_POINT_QUERY_PARAMETER,
+    COVERAGE_IDENTIFIER_PATH_PARAMETER,
+    DEFAULT_COORDS_POINT_QUERY_PARAMETER,
+    MANN_KENDALL_DATETIME_QUERY_PARAMETER,
+    TIME_SERIES_DATETIME_QUERY_PARAMETER,
 )
 from ..schemas.analytics import TimeSeriesDownloadRequestRead
 from ..schemas.coverages import (
@@ -1101,10 +1107,10 @@ def get_forecast_time_series(
 def get_historical_time_series(
     settings: Annotated[ArpavPpcvSettings, Depends(dependencies.get_settings)],
     http_client: Annotated[httpx.Client, Depends(dependencies.get_sync_http_client)],
-    coverage_identifier: parameters.COVERAGE_IDENTIFIER_PATH_PARAMETER,
-    coords: parameters.COORDS_POINT_QUERY_PARAMETER = parameters.DEFAULT_COORDS_POINT_QUERY_PARAMETER,
-    datetime: parameters.TIME_SERIES_DATETIME_QUERY_PARAMETER = "../..",
-    mann_kendall_datetime: parameters.MANN_KENDALL_DATETIME_QUERY_PARAMETER = None,
+    coverage_identifier: COVERAGE_IDENTIFIER_PATH_PARAMETER,
+    coords: COORDS_POINT_QUERY_PARAMETER = DEFAULT_COORDS_POINT_QUERY_PARAMETER,
+    datetime: TIME_SERIES_DATETIME_QUERY_PARAMETER = "../..",
+    mann_kendall_datetime: MANN_KENDALL_DATETIME_QUERY_PARAMETER = None,
     include_moving_average_series: bool = False,
     include_decade_aggregation_series: bool = False,
     include_loess_series: bool = False,
@@ -1271,7 +1277,7 @@ def notify_time_series_download_request(
     session: Annotated[Session, Depends(dependencies.get_db_session)],
     coverage_identifier: str,
     analytics_params: Annotated[dependencies.DownloadAnalyticsParameters, Depends()],
-    coords: Annotated[str, Query(max_length=20)],
+    coords: COORDS_POINT_QUERY_PARAMETER,
 ) -> TimeSeriesDownloadRequestRead:
     """Notify backend of a download request for time series data for a coverage."""
     raw_category = coverage_identifier.split("-")[0]

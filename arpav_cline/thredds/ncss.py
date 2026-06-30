@@ -81,7 +81,8 @@ class SimpleCoverageDataRetriever:
             time_start=temporal_range[0],
             time_end=temporal_range[1],
         )
-        if raw_data is not None:
+        logger.debug(f"{raw_data=}")
+        if raw_data:
             result = _parse_ncss_dataset(
                 raw_data,
                 netcdf_variable_name,

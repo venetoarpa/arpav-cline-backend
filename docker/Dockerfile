@@ -67,6 +67,9 @@ RUN echo $GIT_COMMIT > /home/appuser/git-commit.txt
 # Compile python stuff to bytecode to improve startup times
 RUN poetry run python -c "import compileall; compileall.compile_path(maxlevels=10)"
 
+# Compile translations
+RUN poetry run arpav-cline translations compile
+
 # use tini as the init process
 ENTRYPOINT ["tini", "-g", "--", "poetry", "run", "arpav-cline"]
 

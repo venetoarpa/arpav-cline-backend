@@ -7,13 +7,7 @@ on:
 
 env:
   COLUMNS: 120
-  # disabled publishing of docker images
-  # re-enabling requires that you create a couple of repo secrets:
-  # - secrets.USER_FOR_REGISTRY - username of a GitHub user that is able to login to the repository's docker registry
-  # - secrets.PAT_FOR_REGISTRY - GitHub Personal Access Token of the GitHub user that grants it access to publish
-  #   docker images in the repo registry
-  # PUBLISH_IMAGE: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && 'TRUE' || 'FALSE'}}
-  PUBLISH_IMAGE: false
+  PUBLISH_IMAGE: ${{ (github.ref_name == 'main' || github.ref_type == 'tag') && github.repository_owner == 'geobeyond' && 'TRUE' || 'FALSE'}}
   IMAGE_TAG: ${{ github.ref_name == 'main' && 'latest' || github.ref_name }}
   IMAGE_NAME: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
 

@@ -120,6 +120,7 @@ class DeploymentConfiguration:
     webapp_env_db_dsn: str = dataclasses.field(init=False)
     webapp_env_db_pool_size: int
     webapp_env_debug: bool = dataclasses.field(init=False)
+    webapp_env_http_client_timeout_seconds: float
     webapp_env_num_uvicorn_worker_processes: int
     webapp_env_public_url: str
     webapp_env_session_secret_key: str
@@ -286,6 +287,9 @@ class DeploymentConfiguration:
                 if i != ""
             ],
             webapp_env_db_pool_size=int(config_parser["webapp"]["env_db_pool_size"]),
+            webapp_env_http_client_timeout_seconds=float(
+                config_parser["webapp"].get("env_http_client_timeout_seconds", 30.0)
+            ),
             webapp_env_num_uvicorn_worker_processes=config_parser.getint(
                 "webapp", "env_num_uvicorn_worker_processes"
             ),

@@ -15,6 +15,7 @@ concurrency: staging
 
 jobs:
   initiate-deployment:
+    if: github.repository_owner == 'geobeyond'
     runs-on: ubuntu-22.04
     environment: staging
     steps:

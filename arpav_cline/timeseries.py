@@ -549,23 +549,25 @@ def get_historical_observation_series(
         if obs_data_series is not None:
             result.append(obs_data_series)
             if include_loess_series:
-                result.append(
-                    generate_loess_derived_observation_station_series(
-                        obs_data_series, point_geom
-                    )
+                loess_series = generate_loess_derived_observation_station_series(
+                    obs_data_series, point_geom
                 )
+                if not loess_series.data_.isna().all():
+                    result.append(loess_series)
             if include_moving_average_series:
-                result.append(
+                moving_average_series = (
                     generate_moving_average_derived_observation_station_series(
                         obs_data_series, point_geom
                     )
                 )
+                if not moving_average_series.data_.isna().all():
+                    result.append(moving_average_series)
             if include_decade_aggregation_series:
                 if (
                     decade_series := generate_decade_derived_observation_station_series(
                         obs_data_series, point_geom
                     )
-                ) is not None:
+                ) is not None and not decade_series.data_.isna().all():
                     result.append(decade_series)
             if mann_kendall_params is not None:
                 try:
@@ -613,27 +615,32 @@ def get_historical_time_series(
     if cov_series is not None:
         result.append(cov_series)
         if include_loess_series:
-            result.append(generate_loess_derived_historical_coverage_series(cov_series))
+            loess_series = generate_loess_derived_historical_coverage_series(cov_series)
+            if not loess_series.data_.isna().all():
+                result.append(loess_series)
         if include_moving_average_series:
-            result.append(
+            moving_average_series = (
                 generate_moving_average_derived_historical_coverage_series(cov_series)
             )
+            if not moving_average_series.data_.isna().all():
+                result.append(moving_average_series)
         if include_decade_aggregation_series:
             if (
                 decade_series := generate_decade_derived_historical_coverage_series(
                     cov_series
                 )
-            ) is not None:
+            ) is not None and not decade_series.data_.isna().all():
                 result.append(decade_series)
         if mann_kendall_params is not None:
             try:
-                result.append(
+                mann_kendall_series = (
                     generate_mann_kendall_derived_historical_coverage_series(
                         cov_series,
                         start_year=mann_kendall_params.start_year,
                         end_year=mann_kendall_params.end_year,
                     )
                 )
+                result.append(mann_kendall_series)
             except MannKendallInsufficientYearError as err:
                 logger.warning(f"Could not generate Mann-Kendall trend series: {err}")
     return result
@@ -715,7 +722,8 @@ def get_forecast_coverage_time_series(
                 cov_data_series,
                 processing_method,
             )
-            result.append(derived_series)
+            if not derived_series.data_.isna().all():
+                result.append(derived_series)
     return result
 
 
@@ -786,7 +794,8 @@ def _get_forecast_coverage_observation_time_series(
                         derived_series_name=series.identifier,
                     )
                     series.data_ = smoothed_df[series.identifier].squeeze()
-                    result.append(series)
+                    if not series.data_.isna().all():
+                        result.append(series)
         else:
             logger.info("No station data found, skipping...")
     else:
@@ -926,7 +935,8 @@ def get_observation_overview_time_series(
         if pm != static.CoverageTimeSeriesProcessingMethod.NO_PROCESSING
     ):
         derived_series = generate_derived_overview_series(series, processing_method)
-        result.append(derived_series)
+        if not derived_series.data_.isna().all():
+            result.append(derived_series)
     return result
 
 
@@ -954,7 +964,8 @@ def get_forecast_overview_time_series(
             derived_series = generate_derived_overview_series(
                 overview_series, processing_method
             )
-            result.append(derived_series)
+            if not derived_series.data_.isna().all():
+                result.append(derived_series)
     return result
 
 

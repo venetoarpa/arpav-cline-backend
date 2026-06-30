@@ -133,6 +133,7 @@ from .observationstations import (
     delete_observation_station,  # noqa
     get_observation_station,  # noqa
     get_observation_station_by_code,  # noqa
+    get_observation_station_by_name,  # noqa
     list_observation_stations,  # noqa
     update_observation_station,  # noqa
 )

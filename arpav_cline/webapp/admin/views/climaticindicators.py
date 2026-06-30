@@ -55,6 +55,7 @@ class ClimaticIndicatorView(ModelView):
     exclude_fields_from_detail = ("id",)
     exclude_fields_from_edit = ("identifier",)
     exclude_fields_from_create = ("identifier",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),

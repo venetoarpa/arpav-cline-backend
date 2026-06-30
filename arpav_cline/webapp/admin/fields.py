@@ -4,6 +4,7 @@ from typing import Any
 import anyio.to_thread
 import starlette_admin
 from starlette.requests import Request
+from starlette_admin import RequestAction
 
 from ... import db
 
@@ -164,8 +165,14 @@ class RelatedObservationSeriesConfigurationField(starlette_admin.EnumField):
 
 class RelatedObservationStationField(starlette_admin.EnumField):
     def __post_init__(self) -> None:
+        self.search_builder_type = "eq_only"
         self.choices_loader = RelatedObservationStationField.choices_loader
         super().__post_init__()
+
+    def additional_js_links(self, request: Request, action: RequestAction) -> list[str]:
+        if action == RequestAction.LIST:
+            return [str(request.url_for("admin:statics", path="eq-only-conditions.js"))]
+        return []
 
     async def serialize_value(
         self, request: Request, value: Any, action: starlette_admin.RequestAction
@@ -237,6 +244,7 @@ class RelatedClimaticIndicatorField(starlette_admin.EnumField):
     """
 
     def __post_init__(self) -> None:
+        self.search_builder_type = "eq_only"
         self.choices_loader = RelatedClimaticIndicatorField.choices_loader
         super().__post_init__()
 

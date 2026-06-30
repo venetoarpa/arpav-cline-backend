@@ -33,6 +33,7 @@ class ForecastCoverageDownloadRequestView(ModelView):
 
     exclude_fields_from_list = ("id",)
     exclude_fields_from_detail = ("id",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),
@@ -111,6 +112,7 @@ class HistoricalCoverageDownloadRequestView(ModelView):
 
     exclude_fields_from_list = ("id",)
     exclude_fields_from_detail = ("id",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),
@@ -119,6 +121,9 @@ class HistoricalCoverageDownloadRequestView(ModelView):
         starlette_admin.BooleanField("is_public_sector"),
         starlette_admin.StringField("download_reason"),
         starlette_admin.StringField("climatological_variable"),
+        starlette_admin.StringField("aggregation_period"),
+        starlette_admin.StringField("measure_type"),
+        starlette_admin.StringField("year_period"),
         starlette_admin.StringField("decade"),
         starlette_admin.StringField("reference_period"),
     )
@@ -185,6 +190,7 @@ class TimeSeriesDownloadRequestView(ModelView):
 
     exclude_fields_from_list = ("id",)
     exclude_fields_from_detail = ("id",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),

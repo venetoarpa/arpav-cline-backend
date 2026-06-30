@@ -65,6 +65,7 @@ class ForecastTimeWindowView(ModelView):
         starlette_admin.StringField("description_italian"),
         starlette_admin.IntegerField("sort_order"),
     )
+    search_builder = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -164,6 +165,7 @@ class ForecastModelView(ModelView):
         starlette_admin.StringField("description_italian"),
         starlette_admin.IntegerField("sort_order"),
     )
+    search_builder = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -264,6 +266,7 @@ class ForecastModelGroupView(ModelView):
             "forecast_models", multiple=True, required=True
         ),
     )
+    search_builder = False
 
     @staticmethod
     def _serialize_instance(
@@ -365,6 +368,7 @@ class ForecastYearPeriodGroupView(ModelView):
             "year_periods", multiple=True, enum=static.ForecastYearPeriod, required=True
         ),
     )
+    search_builder = False
 
     @staticmethod
     def _serialize_instance(
@@ -468,6 +472,7 @@ class HistoricalYearPeriodGroupView(ModelView):
             required=True,
         ),
     )
+    search_builder = False
 
     @staticmethod
     def _serialize_instance(
@@ -570,6 +575,7 @@ class ForecastCoverageConfigurationView(ModelView):
     exclude_fields_from_edit = ("identifier",)
     exclude_fields_from_create = ("identifier",)
     searchable_fields = ("climatic_indicator",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),
@@ -852,6 +858,7 @@ class HistoricalCoverageConfigurationView(ModelView):
     exclude_fields_from_edit = ("identifier",)
     exclude_fields_from_create = ("identifier",)
     searchable_fields = ("climatic_indicator",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),

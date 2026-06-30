@@ -49,6 +49,7 @@ class ObservationOverviewSeriesConfigurationView(ModelView):
     exclude_fields_from_edit = ("identifier",)
     exclude_fields_from_create = ("identifier",)
     searchable_fields = ("climatic_indicator",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),
@@ -191,6 +192,7 @@ class ForecastOverviewSeriesConfigurationView(ModelView):
     exclude_fields_from_edit = ("identifier",)
     exclude_fields_from_create = ("identifier",)
     searchable_fields = ("climatic_indicator",)
+    search_builder = False
 
     fields = (
         starlette_admin.IntegerField("id"),

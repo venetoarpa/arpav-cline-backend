@@ -42,6 +42,7 @@ class SpatialRegionView(ModelView):
         starlette_admin.IntegerField("sort_order"),
         starlette_admin.JSONField("geom", required=True),
     )
+    search_builder = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

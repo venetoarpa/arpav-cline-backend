@@ -35,12 +35,20 @@ def get_observation_station(
     return session.get(ObservationStation, observation_station_id)
 
 
+def get_observation_station_by_name(
+    session: sqlmodel.Session, name: str
+) -> Optional[ObservationStation]:
+    return session.exec(
+        sqlmodel.select(ObservationStation).where(ObservationStation.name == name)  # noqa
+    ).first()
+
+
 def get_observation_station_by_code(
     session: sqlmodel.Session, code: str
 ) -> Optional[ObservationStation]:
     """Get an observation station by its code"""
     return session.exec(
-        sqlmodel.select(ObservationStation).where(ObservationStation.code == code)  # noqa  # noqa
+        sqlmodel.select(ObservationStation).where(ObservationStation.code == code)  # noqa
     ).first()
 
 

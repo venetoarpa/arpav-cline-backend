@@ -39,9 +39,15 @@ class ObservationMeasurementView(ModelView):
             "measurement_aggregation_type",
             enum=static.MeasurementAggregationType,
             required=True,
+            search_builder_type="eq_only",
         ),
         starlette_admin.DateField("date", required=True),
         starlette_admin.FloatField("value", required=True),
+    )
+    searchable_fields = (
+        "observation_station",
+        "climatic_indicator",
+        "measurement_aggregation_type",
     )
 
     def __init__(self, *args, **kwargs) -> None:
@@ -69,6 +75,90 @@ class ObservationMeasurementView(ModelView):
             climatic_indicator=instance.climatic_indicator_id,
         )
 
+    @staticmethod
+    def _extract_eq_value(where: dict[str, Any], field_name: str) -> Any:
+        for condition in where.get("and", []):
+            if field_name in condition:
+                return condition[field_name].get("eq")
+        return None
+
+    async def _resolve_filters(
+        self, request: Request, where: Union[dict[str, Any], str, None]
+    ) -> tuple[
+        Optional[int], Optional[int], Optional[static.MeasurementAggregationType]
+    ]:
+        session = request.state.session
+        station_id_filter = None
+        indicator_id_filter = None
+        aggregation_type_filter = None
+        if isinstance(where, str):
+            station = await anyio.to_thread.run_sync(
+                db.get_observation_station_by_name, session, where
+            )
+            station_id_filter = station.id if station is not None else None
+        elif isinstance(where, dict):
+            if (
+                station_name := self._extract_eq_value(where, "observation_station")
+            ) is not None:
+                logger.debug(f"{station_name=}")
+                station = await anyio.to_thread.run_sync(
+                    db.get_observation_station_by_name, session, station_name
+                )
+                logger.debug(f"{station=}")
+                station_id_filter = station.id if station is not None else None
+            if (
+                indicator_identifier := self._extract_eq_value(
+                    where, "climatic_indicator"
+                )
+            ) is not None:
+                logger.debug(f"{indicator_identifier=}")
+                try:
+                    indicator = await anyio.to_thread.run_sync(
+                        db.get_climatic_indicator_by_identifier,
+                        session,
+                        indicator_identifier,
+                    )
+                    logger.debug(f"{indicator=}")
+                    indicator_id_filter = (
+                        indicator.id if indicator is not None else None
+                    )
+                except Exception:
+                    indicator_id_filter = None
+            if (
+                raw_aggregation_type := self._extract_eq_value(
+                    where, "measurement_aggregation_type"
+                )
+            ) is not None:
+                try:
+                    aggregation_type_filter = static.MeasurementAggregationType[
+                        raw_aggregation_type.upper()
+                    ]
+                except KeyError:
+                    aggregation_type_filter = None
+        return station_id_filter, indicator_id_filter, aggregation_type_filter
+
+    async def count(
+        self,
+        request: Request,
+        where: Union[dict[str, Any], str, None] = None,
+    ) -> int:
+        (
+            station_id_filter,
+            indicator_id_filter,
+            aggregation_type_filter,
+        ) = await self._resolve_filters(request, where)
+        counter = functools.partial(
+            db.list_observation_measurements,
+            limit=0,
+            offset=0,
+            include_total=True,
+            observation_station_id_filter=station_id_filter,
+            climatic_indicator_id_filter=indicator_id_filter,
+            aggregation_type_filter=aggregation_type_filter,
+        )
+        _, total = await anyio.to_thread.run_sync(counter, request.state.session)
+        return total or 0
+
     async def find_all(
         self,
         request: Request,
@@ -77,11 +167,20 @@ class ObservationMeasurementView(ModelView):
         where: Union[dict[str, Any], str, None] = None,
         order_by: Optional[list[str]] = None,
     ) -> Sequence[read_schemas.ObservationMeasurementRead]:
+        logger.debug(f"{locals()=}")
+        (
+            station_id_filter,
+            indicator_id_filter,
+            aggregation_type_filter,
+        ) = await self._resolve_filters(request, where)
         list_measurements = functools.partial(
             db.list_observation_measurements,
             limit=limit,
             offset=skip,
             include_total=False,
+            observation_station_id_filter=station_id_filter,
+            climatic_indicator_id_filter=indicator_id_filter,
+            aggregation_type_filter=aggregation_type_filter,
         )
         db_measurements, _ = await anyio.to_thread.run_sync(
             list_measurements, request.state.session
@@ -112,6 +211,7 @@ class ObservationStationView(ModelView):
         starlette_admin.DateField("active_until"),
         starlette_admin.FloatField("altitude_m"),
     )
+    search_builder = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -230,6 +330,7 @@ class ObservationSeriesConfigurationView(ModelView):
         "identifier",
     )
     exclude_fields_from_create = ("identifier",)
+    search_builder = False
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
